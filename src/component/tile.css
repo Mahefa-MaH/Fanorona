@@ -1,0 +1,19 @@
+.tile {
+    display: grid;
+    place-content: center;
+    width:40px;
+    height: 40px;
+    background-color: rebeccapurple;
+}
+
+.tile .piece{
+    width: 35px;
+    height: 35px;
+}
+
+.tile .piece:hover{
+    cursor: grab;
+}
+.tile .piece:active{
+    cursor: grabbing;
+}
