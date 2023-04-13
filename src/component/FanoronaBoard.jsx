@@ -34,13 +34,16 @@ function FanoronaBoard(){
         if(activePiece && boardRef){
             const minX = boardr.offsetLeft;
             const minY = boardr.offsetTop;
+            const maxX = boardr.offsetLeft + boardr.clientWidth - 90;
+            const maxY = boardr.offsetTop + boardr.clientHeight - 110;
+            console.log(maxY);
             const x = e.clientX - 20;
             const y = e.clientY - 20;
             activePiece.style.position = "absolute";
             activePiece.style.top = `${y}px`;
 
-            activePiece.style.left =  (x < minX)?`${minX}px`:`${x}px`;
-            activePiece.style.top =  (y < minY)?`${minY}px`:`${y}px`;
+            activePiece.style.left =  (x < minX)?`${minX}px`:((x > maxX)?`${maxX}px`:`${x}px`);
+            activePiece.style.top =  (y < minY)?`${minY}px`:((y > maxY)?`${maxY}px`:`${y}px`);
         }
     }
     
