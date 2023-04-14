@@ -1,9 +1,11 @@
 class Piece {
-    constructor(p, x, y, image) {
+    constructor(p, x, y, row, col, image) {
       this.p = p;
       this.image  = image;
       this.x = x;         // the x position of the piece on the board
-      this.y = y;         // the y position of the piece on the board
+      this.y = y;
+      this.row = row;         // the x position of the piece on the board
+      this.col = col;            // the y position of the piece on the board
       this.isCaptured = false; // whether the piece has been captured or not
     }
   

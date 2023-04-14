@@ -11,6 +11,7 @@ function FanoronaBoard() {
   const rowCount = 5;
   const columnCount = 9;
   const radius = blockSize / 9;
+  let selectedP = new Piece();
 
   function updateCanvasSize(context) {
     var width = (window.width()/10)*9;
@@ -23,7 +24,6 @@ function FanoronaBoard() {
     const canvas = canvasRef.current;
     const c = canvas.getContext('2d');
     ctx = c;
-    let selectedP = [];
   
     // Set canvas size to fit board
     canvas.width = blockSize*columnCount + 85;
@@ -38,13 +38,13 @@ function FanoronaBoard() {
     canvas.addEventListener('mouseup', rehefMouseUp);
     // return () => canvas.removeEventListener('mousedown',rehefMouseDown);
     function rehefMouseDown(e){
-      selectedP = grabPiece(e, ctx);
+      grabPiece(e, ctx);
     }
     function rehefMouseMove(e){
       movePiece(e, ctx);
     }
     function rehefMouseUp(e){
-      dropPiece(e, ctx, selectedP);
+      dropPiece(e, ctx);
     }
 
   }, []);
@@ -131,7 +131,7 @@ function FanoronaBoard() {
         DrawPiece(ctx, vato, x, y , w , h);
 
         if(true){
-          var piece = new Piece(Map.map[row][col], x, y);
+          var piece = new Piece(Map.map[row][col], x, y, row, col, "./assets/image/");
           // Add mouse down event listener to piece
         // piece.onMouseDown = (event) => {
         //   console.log(`Piece at row ${row}, column ${col} was clicked`);
@@ -149,7 +149,6 @@ function FanoronaBoard() {
   function DrawPiece(ctx, vato, x, y, w, h){
         ctx.clearRect(x-w, y-h, 2*w, 2*h);
         // ctx.fillRect(x-w, y-h, 2*w, 2*h);
-        console.log(x, y , x+5)
         ctx.beginPath();
         if(vato === 1){
           ctx.fillStyle = "green";
@@ -167,77 +166,99 @@ function FanoronaBoard() {
           p_image.src = "./assets/images/logo192.png";
           ctx.fill();
           p_image.onload = () => {
-            ctx.drawImage(p_image,x-20,y-20,w,h);
+            ctx.drawImage(p_image,x-w/2,y-w/2,w,h);
           }
         }
   }
 
   let activePiece; 
   function grabPiece(e, ctx){
-    let selectedP = [];
     const element = e.target;
-    if(element){
-        let x = Math.round((e.clientX - halfBlock) / blockSize);
-        let r_x = (e.clientX - halfBlock) / blockSize - x;
-        let y = Math.round((e.clientY - halfBlock) / blockSize);
-        let r_y = ((e.clientY - halfBlock) / blockSize) - y;
+    const canvasRect = element.getBoundingClientRect();
+    const scaleX = element.width / canvasRect.width;
+    const scaleY = element.height / canvasRect.height;
+    const cX = (e.clientX - canvasRect.left)*scaleX;
+    const cY = (e.clientY - canvasRect.top)*scaleY;
+    if(true){
+        let x = Math.round((cX -halfBlock ) / blockSize);
+        let r_x = (cX -halfBlock ) / blockSize - x;
+        let y = Math.round((cY - halfBlock) / blockSize);
+        let r_y = ((cY -halfBlock) / blockSize) - y;
         x = x>0?x:0; x = x<9?x:8;
         y = y>0?y:0; y = y<5?y:4;
 
         if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2){
           Map.mapPObj[y][x].capture();
+          selectedP = Map.mapPObj[y][x];
+          DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+halfBlock, y*blockSize+halfBlock, 60, 60);
           // Map.mapPObj[y][x].p = 2;
           // Map.mapPObj[y][x].x = e.clientX;
           // Map.mapPObj[y][x].y = e.clientY;
         }
         ctx.fillStyle = "white";
-        DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+80, y*blockSize+80, 60, 60);
-        console.log(Map.mapPObj[y][x]);
-        activePiece = element;
-        selectedP.push(x);
-        selectedP.push(y);
+        activePiece = true;
       }
-      return selectedP;
   }
 
   function movePiece(e, ctx){
+    const element = e.target;
+    const canvasRect = element.getBoundingClientRect();
+    const scaleX = element.width / canvasRect.width;
+    const scaleY = element.height / canvasRect.height;
+    const cX = (e.clientX - canvasRect.left)*scaleX;
+    const cY = (e.clientY - canvasRect.top)*scaleY;
       if(activePiece){
-          let x = Math.round((e.clientX - halfBlock) / blockSize);
-          let r_x = (e.clientX - halfBlock) / blockSize - x;
-          let y = Math.round((e.clientY - halfBlock) / blockSize);
-          let r_y = ((e.clientY - halfBlock) / blockSize) - y;
+        let x = Math.round((cX -halfBlock ) / blockSize);
+        let r_x = (cX -halfBlock ) / blockSize - x;
+        let y = Math.round((cY - halfBlock) / blockSize);
+        let r_y = ((cY -halfBlock) / blockSize) - y;
           x = x>0?x:0; x = x<9?x:8;
           y = y>0?y:0; y = y<5?y:4;
           const minX = ctx.offsetLeft;
           const minY = ctx.offsetTop;
           const maxX = ctx.offsetLeft + ctx.clientWidth - 90;
           const maxY = ctx.offsetTop + ctx.clientHeight - 110;
-          if(r_x < 0.2 && r_y < 0.2){
-            //
+          if(x<minX){
+            dropPiece(e,ctx);
           }
 
           // Draw();
       }
   }
 
-  function dropPiece(e, ctx, sp){
+  function dropPiece(e, ctx){
+    const element = e.target;
+    const canvasRect = element.getBoundingClientRect();
+    const scaleX = element.width / canvasRect.width;
+    const scaleY = element.height / canvasRect.height;
+    const cX = (e.clientX - canvasRect.left)*scaleX;
+    const cY = (e.clientY - canvasRect.top)*scaleY;
+    const sp = selectedP;
       if(activePiece){
-        let x = Math.round((e.clientX - halfBlock) / blockSize);
-        let r_x = (e.clientX - halfBlock) / blockSize - x;
-        let y = Math.round((e.clientY - halfBlock) / blockSize);
-        let r_y = ((e.clientY - halfBlock) / blockSize) - y;
+        let x = Math.round((cX -halfBlock ) / blockSize);
+        let r_x = (cX -halfBlock ) / blockSize - x;
+        let y = Math.round((cY - halfBlock) / blockSize);
+        let r_y = ((cY -halfBlock) / blockSize) - y;
         x = x>0?x:0; x = x<9?x:8;
         y = y>0?y:0; y = y<5?y:4;
-        console.log(y)
-        if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2){
-          DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+80, y*blockSize+80, 40, 40);
-          // Map.mapPObj[y][x].lacher();
+        if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && sp.isCaptured && Map.mapPObj[y][x].p === 0 ){
+          const a = Map.mapPObj[y][x].p;
+          const b = sp.p;
+          sp.lacher();
+          Map.mapPObj[sp.row][sp.col]["p"] = a;
+          Map.mapPObj[y][x]["p"] = b;
+          DrawPiece(ctx, b, x*blockSize+80, y*blockSize+80, 40, 40);
+          DrawPiece(ctx, a, sp.x, sp.y, 40, 40);
+          activePiece = false;
+          return;
           //Placer la piece
+        
         }
-        Map.mapPObj[y][x].lacher();
         activePiece = false;
-        DrawPiece(ctx, Map.mapPObj[sp[1]][sp[0]]["p"], sp[0]*blockSize+80, sp[1]*blockSize+80, 40, 40);
+        Map.mapPObj[y][x].lacher();
+        DrawPiece(ctx, sp.p, sp.x, sp.y, 40, 40);
       }
+      selectedP = 0;
   }
   return <canvas
                 style={{
