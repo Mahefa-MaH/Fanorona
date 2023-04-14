@@ -12,13 +12,8 @@ function FanoronaBoard() {
   const columnCount = 9;
   const radius = blockSize / 9;
   let selectedP = new Piece();
+  let player = Math.ceil((Math.random()*10)%2);
 
-  function updateCanvasSize(context) {
-    var width = (window.width()/10)*9;
-    var height = (window.height()/10)*5;
-    context.canvas.width  = width;
-    context.canvas.height = height;
-    };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -124,12 +119,11 @@ function FanoronaBoard() {
                w = 60;
                h = 60;
             }
-            // console.log( p)
           }
         }
-        
         DrawPiece(ctx, vato, x, y , w , h);
 
+        //Creer le Map
         if(true){
           var piece = new Piece(Map.map[row][col], x, y, row, col, "./assets/image/");
           // Add mouse down event listener to piece
@@ -186,8 +180,12 @@ function FanoronaBoard() {
         let r_y = ((cY -halfBlock) / blockSize) - y;
         x = x>0?x:0; x = x<9?x:8;
         y = y>0?y:0; y = y<5?y:4;
+        let tab_dpos = canMoveTo(x,y);
+          tab_dpos.forEach(val => {
+            // console.log(val);
+        });
 
-        if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2){
+        if(Map.mapPObj[y][x].p===player && Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && tab_dpos.length>0){
           Map.mapPObj[y][x].capture();
           selectedP = Map.mapPObj[y][x];
           DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+halfBlock, y*blockSize+halfBlock, 60, 60);
@@ -249,6 +247,7 @@ function FanoronaBoard() {
           Map.mapPObj[y][x]["p"] = b;
           DrawPiece(ctx, b, x*blockSize+80, y*blockSize+80, 40, 40);
           DrawPiece(ctx, a, sp.x, sp.y, 40, 40);
+          player = player===2?1:2;
           activePiece = false;
           return;
           //Placer la piece
@@ -260,6 +259,44 @@ function FanoronaBoard() {
       }
       selectedP = 0;
   }
+
+  let lalanaNandeanan = [];
+  function canMoveTo(x, y){
+    var t = [];
+    var lln = [];
+
+    if( (x+y)%2 == 0 ){
+      for(let i = x-1; i <= x+1; i++){
+        for(let j = y-1; j <= y+1; j++){
+                if( (lalanaNandeanan.length > 0 ) ){
+                  lalanaNandeanan.forEach(val => {
+                    console.log(val);
+                  });
+                    console.log("Efa nandehanana", lalanaNandeanan);
+                }
+                else if( !(i==x && j==y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p==0 ){
+                    t.push([i,j]);
+                }
+            }
+        }
+    }else{
+      for(let i = x-1; i <= x+1; i++){
+        for(let j = y-1; j <= y+1; j++){
+                if( (lalanaNandeanan.length > 0 ) ){
+                  lalanaNandeanan.forEach(val => {
+                    console.log(val);
+                  });
+                    console.log("Efa nandehanana", lalanaNandeanan);
+                }
+                else if(  !(i==x && j==y) && (i==x || j==y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p==0  ){
+                    t.push([i,j]);
+                }
+            }
+        }
+    }
+    return t;
+  }
+
   return <canvas
                 style={{
                   backgroundImage: `url(./assets/images/board.png)`,
