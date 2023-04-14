@@ -1,5 +1,5 @@
 import React from 'react'
-import FanoronaBoard from './component/FanoronaBoard';
+import FanoronaBoard from './component0/FanoronaBoard';
 
 import "./App.css";
 
