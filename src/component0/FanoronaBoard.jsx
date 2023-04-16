@@ -13,6 +13,12 @@ function FanoronaBoard() {
   const radius = blockSize / 9;
   let selectedP = new Piece();
   let player = Math.ceil((Math.random()*10)%2);
+  let lalanaNandeanan = [];
+  let tab_dpos = [];
+  let findEnemyPiece = false;
+  let piece_selectable = [];
+  const [nPiece, setNPiece] = useState([0,0,0]);
+  let newTurn = true;
 
 
   useEffect(() => {
@@ -33,6 +39,15 @@ function FanoronaBoard() {
     canvas.addEventListener('mouseup', rehefMouseUp);
     // return () => canvas.removeEventListener('mousedown',rehefMouseDown);
     function rehefMouseDown(e){
+      if(newTurn){
+        Draw();
+        lalanaNandeanan = [];
+        tab_dpos = [];
+        findEnemyPiece = false;
+        piece_selectable = [];
+        setNPiece([0,0,0]);
+        player = Math.ceil((Math.random()*10)%2);
+      }
       grabPiece(e, ctx);
     }
     function rehefMouseMove(e){
@@ -44,11 +59,13 @@ function FanoronaBoard() {
 
   }, []);
 
+
   function Draw(){
     ctx.clearRect(0, 0, blockSize*columnCount + 85, blockSize*rowCount + 85);
     for (let row = 0; row < rowCount; row++) {
-      if( Map.mapPObj.length <= row){
+      if( Map.mapPObj.length <= row || newTurn){
         Map.mapPObj.push([]);
+        newTurn = false;
       }
       for (let col = 0; col < columnCount; col++) {
         // let x = (col - row) * halfBlock + canvas.width / 2;
@@ -61,50 +78,6 @@ function FanoronaBoard() {
         y += halfBlock;
         let x2 = x;
         let y2 = y;
-
-/*
-        // Draw line and column tile
-        if(col === 0  ){
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          // x2 += (columnCount-1)*halfBlock;
-          // y2 += (rowCount-1)*halfBlock;
-          x2 = x+ (columnCount - 1)*blockSize;
-          y2 = y;
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
-        }
-        if((row === 0 )){
-          ctx.beginPath();  
-          ctx.moveTo(x, y);
-          // x2 -= (blockSize*2);
-          // y2 += blockSize;
-          x2 = x;
-          y2 = y + (rowCount - 1)*blockSize;
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
-        }
-
-        // Draw diagonal line
-        ctx.beginPath();
-        if (col % 2 === 0 && col > 0 && row > 0 && row%2 === 0) {
-          ctx.moveTo(x , y);
-          // x2 = x;
-          // y2 = y - 2*halfBlock;
-          x2 = x - 2*blockSize;
-          y2 = y - 2*blockSize;
-          ctx.lineTo( x2, y2 );
-        }
-        if (col % 2 === 0 && col > 0 && row < rowCount-1 && row%2 === 0) {
-          ctx.moveTo(x, y );
-          // x2 = x- 2*blockSize;
-          // y2 = y;
-          x2 = x - 2*blockSize;
-          y2 = y + 2*blockSize;
-          ctx.lineTo(x2 , y2);
-        }
-        ctx.stroke();
-*/
 
         // Draw circle piece
         var vato = Map.map[row][col];
@@ -126,13 +99,10 @@ function FanoronaBoard() {
         //Creer le Map
         if(true){
           var piece = new Piece(Map.map[row][col], x, y, row, col, "./assets/image/");
-          // Add mouse down event listener to piece
-        // piece.onMouseDown = (event) => {
-        //   console.log(`Piece at row ${row}, column ${col} was clicked`);
-        //   // You can add your logic for handling the click event here
-        // }
           if( Map.mapPObj[row].length <= col){
             Map.mapPObj[row].push(piece);
+            nPiece[Map.map[row][col]]++;
+            setNPiece([nPiece[0],nPiece[1],nPiece[2]]);
           }
         }
 
@@ -173,14 +143,14 @@ function FanoronaBoard() {
     const scaleY = element.height / canvasRect.height;
     const cX = (e.clientX - canvasRect.left)*scaleX;
     const cY = (e.clientY - canvasRect.top)*scaleY;
-    if(true){
-        let x = Math.round((cX -halfBlock ) / blockSize);
-        let r_x = (cX -halfBlock ) / blockSize - x;
-        let y = Math.round((cY - halfBlock) / blockSize);
-        let r_y = ((cY -halfBlock) / blockSize) - y;
-        x = x>0?x:0; x = x<9?x:8;
-        y = y>0?y:0; y = y<5?y:4;
-        let tab_dpos = canMoveTo(x,y);
+    let x = Math.round((cX -halfBlock ) / blockSize);
+    let r_x = (cX -halfBlock ) / blockSize - x;
+    let y = Math.round((cY - halfBlock) / blockSize);
+    let r_y = ((cY -halfBlock) / blockSize) - y;
+    x = x>0?x:0; x = x<9?x:8;
+    y = y>0?y:0; y = y<5?y:4;
+    if(!findEnemyPiece){
+        tab_dpos = canMoveTo(x,y);
           tab_dpos.forEach(val => {
             // console.log(val);
         });
@@ -189,12 +159,53 @@ function FanoronaBoard() {
           Map.mapPObj[y][x].capture();
           selectedP = Map.mapPObj[y][x];
           DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+halfBlock, y*blockSize+halfBlock, 60, 60);
+          activePiece = true;
           // Map.mapPObj[y][x].p = 2;
           // Map.mapPObj[y][x].x = e.clientX;
           // Map.mapPObj[y][x].y = e.clientY;
         }
         ctx.fillStyle = "white";
-        activePiece = true;
+      }else{
+        let changePlayer=false;
+        console.log(piece_selectable);
+        for(let i=0;i<piece_selectable.length;i++){
+          if(piece_selectable[i][0]===x && piece_selectable[i][1]===y ){
+            console.log(x,y);
+            let elimin=false;
+            if(i==0){
+              elimin = eliminPiece(player, ctx, y-piece_selectable[i][3], x-piece_selectable[i][2], piece_selectable[i][3], piece_selectable[i][2] , false, true)===true;
+              console.log("avant")
+            }else{
+              elimin = eliminPiece(player, ctx, y-piece_selectable[i][3]*2, x-piece_selectable[i][2]*2, piece_selectable[i][3], piece_selectable[i][2] , true, true)===true;
+              console.log("aoriana")
+            }
+            if( elimin ){
+              // lalanaNandeanan.push([sp.col,sp.row]);
+              //Prevoir s'il peut eliminer encore
+              // tab_dpos = canMoveTo(x,y);
+              changePlayer = true;
+              tab_dpos.forEach(value=>{
+                let canEliminMoreAv = ( eliminPiece(player, ctx, value[1], value[0], value[1]-y-piece_selectable[i][3], value[0]-x-piece_selectable[i][2] , false, false)===true);
+                let canEliminMoreAr = eliminPiece(player, ctx, value[1], value[0], (value[1]-y-piece_selectable[i][3]*2)*-1, (value[0]-x-piece_selectable[i][2]*2)*-1 , true, false)===true;
+                if(canEliminMoreAr || canEliminMoreAv){
+                  console.log("can Eliminate",value[1],value[0],"de x,y",y,x);
+                  changePlayer = false;
+                  // throw "";
+                }else{
+                  lalanaNandeanan = [];
+                  console.log("can't Eliminate");
+                }
+              });
+            }else{
+              changePlayer = true;
+              lalanaNandeanan = [];
+            }
+            console.log("123",lalanaNandeanan)
+            //Echanger le tours des players
+            if(changePlayer){player = player===2?1:2;lalanaNandeanan = [];}
+            findEnemyPiece = false;
+          }
+        }
       }
   }
 
@@ -212,11 +223,7 @@ function FanoronaBoard() {
         let r_y = ((cY -halfBlock) / blockSize) - y;
           x = x>0?x:0; x = x<9?x:8;
           y = y>0?y:0; y = y<5?y:4;
-          const minX = ctx.offsetLeft;
-          const minY = ctx.offsetTop;
-          const maxX = ctx.offsetLeft + ctx.clientWidth - 90;
-          const maxY = ctx.offsetTop + ctx.clientHeight - 110;
-          if(x<minX){
+          if(cX<=10 || cX >=1450 || cY <=10 || cY>=850 ){
             dropPiece(e,ctx);
           }
 
@@ -239,7 +246,10 @@ function FanoronaBoard() {
         let r_y = ((cY -halfBlock) / blockSize) - y;
         x = x>0?x:0; x = x<9?x:8;
         y = y>0?y:0; y = y<5?y:4;
-        if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && sp.isCaptured && Map.mapPObj[y][x].p === 0 ){
+        let dpos = false;
+        tab_dpos.forEach(value=>{if(value[0]===x&&value[1]===y){dpos = true;return;}});
+        lalanaNandeanan.forEach(value=>{if(value[0]===x&value[1]===y){dpos=false;return}});
+        if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && sp.isCaptured && Map.mapPObj[y][x].p === 0 && dpos){
           const a = Map.mapPObj[y][x].p;
           const b = sp.p;
           sp.lacher();
@@ -247,34 +257,79 @@ function FanoronaBoard() {
           Map.mapPObj[y][x]["p"] = b;
           DrawPiece(ctx, b, x*blockSize+80, y*blockSize+80, 40, 40);
           DrawPiece(ctx, a, sp.x, sp.y, 40, 40);
-          player = player===2?1:2;
+
+          //Eliminer les pieces adverses
+          let vectorY = 0;
+          let vectorX = 0;
+          vectorY = y-sp.row;
+          vectorX = x-sp.col;
+          let changePlayer=false;
+          let eliminAvant = eliminPiece(player, ctx, y, x, vectorY, vectorX , false, false)===true;
+          let eliminArriere = eliminPiece(player, ctx, y, x, vectorY*-1, vectorX*-1, true, false)===true;
+          if( eliminAvant && eliminArriere ){
+            findEnemyPiece = true;
+            lalanaNandeanan.push([sp.col,sp.row]);
+            tab_dpos = canMoveTo(x,y);
+            piece_selectable.push([x+vectorX,y+vectorY,vectorX,vectorY],[x+vectorX*-2,y+vectorY*-2,vectorX*-1,vectorY*-1]);
+          }else{
+            eliminAvant = eliminPiece(player, ctx, y, x, vectorY, vectorX , false, true)===true;
+            eliminArriere = eliminPiece(player, ctx, y, x, vectorY*-1, vectorX*-1, true, true)===true;
+            if( eliminAvant || eliminArriere ){
+              lalanaNandeanan.push([sp.col,sp.row]);
+              //Prevoir s'il peut eliminer encore
+              tab_dpos = canMoveTo(x,y);
+              changePlayer = true;
+              tab_dpos.forEach(value=>{
+                let canEliminMoreAv = ( eliminPiece(player, ctx, value[1], value[0], value[1]-y, value[0]-x , false, false)===true);
+                let canEliminMoreAr = eliminPiece(player, ctx, value[1], value[0], (value[1]-y)*-1, (value[0]-x)*-1 , true, false)===true;
+                if(canEliminMoreAr || canEliminMoreAv){
+                  console.log("can Eliminate",value[1],value[0],"de x,y",y,x);
+                  changePlayer = false;
+                  // throw "";
+                }else{
+                  lalanaNandeanan = [];
+                  console.log("can't Eliminate");
+                }
+              });
+              console.log(lalanaNandeanan,tab_dpos);
+            }else{
+              changePlayer = true;
+              lalanaNandeanan = [];
+            }
+          }
+
+          //Echanger le tours des players
+          if(changePlayer){player = player===2?1:2;}
+
           activePiece = false;
           return;
           //Placer la piece
         
         }
         activePiece = false;
-        Map.mapPObj[y][x].lacher();
+        // Map.mapPObj[y][x].lacher();  
         DrawPiece(ctx, sp.p, sp.x, sp.y, 40, 40);
       }
       selectedP = 0;
   }
 
-  let lalanaNandeanan = [];
   function canMoveTo(x, y){
     var t = [];
     var lln = [];
+    let mpush = true;
 
-    if( (x+y)%2 == 0 ){
+    if( (x+y)%2 === 0 ){
       for(let i = x-1; i <= x+1; i++){
         for(let j = y-1; j <= y+1; j++){
+                mpush = true;
                 if( (lalanaNandeanan.length > 0 ) ){
                   lalanaNandeanan.forEach(val => {
-                    console.log(val);
+                    if(val[0]===i&&val[1]===j){
+                      mpush = false;
+                    }
                   });
-                    console.log("Efa nandehanana", lalanaNandeanan);
                 }
-                else if( !(i==x && j==y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p==0 ){
+                if( !(i===x && j===y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p===0 && mpush){
                     t.push([i,j]);
                 }
             }
@@ -282,13 +337,15 @@ function FanoronaBoard() {
     }else{
       for(let i = x-1; i <= x+1; i++){
         for(let j = y-1; j <= y+1; j++){
+                mpush = true;
                 if( (lalanaNandeanan.length > 0 ) ){
                   lalanaNandeanan.forEach(val => {
-                    console.log(val);
+                    if(val[0]===i&&val[1]===j){
+                      mpush = false;
+                    }
                   });
-                    console.log("Efa nandehanana", lalanaNandeanan);
                 }
-                else if(  !(i==x && j==y) && (i==x || j==y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p==0  ){
+                if(  !(i===x && j===y) && (i===x || j===y) && i>-1 && j>-1 && i<9 && j<5 && Map.mapPObj[j][i].p===0 && mpush ){
                     t.push([i,j]);
                 }
             }
@@ -297,13 +354,72 @@ function FanoronaBoard() {
     return t;
   }
 
-  return <canvas
+  function eliminPiece(player, ctx, y, x, vectorY, vectorX , arriere, elimination){
+    let i = y;
+    let j = x;
+    if(arriere){
+      i+=vectorY*2;
+      j+=vectorX*2;
+    }else{
+      i+=vectorY;
+      j+=vectorX;
+    }
+    
+    let retour = false;
+    let canEliminate = false;
+    let voadaka = 0;
+    if( i>=0 && i<5 && j>=0 && j<9 ){
+      canEliminate = true;
+    }else{
+      canEliminate = false;
+    }
+    while(canEliminate){
+      // console.log(Map.mapPObj[i][j].p ,i,j)
+      if(Map.mapPObj[i][j].p === ((player+2)%2+1)){
+        if(elimination){
+          Map.mapPObj[i][j].p = 0;
+          nPiece[(player+2)%2+1]--;
+          setNPiece([nPiece[0],nPiece[1],nPiece[2]]);
+          if(nPiece[((player+2)%2+1)]<=0){
+            console.log("la partie est termine");
+            console.log("le player", player,"a gagne");
+            newTurn = true;
+          }
+          ctx.clearRect(j*blockSize+50, i*blockSize+50, 60, 60);
+          retour = true;
+          // isambato[player-1]--;
+        }else{
+          return true;
+        }
+      }else{
+        canEliminate = false;
+        return retour;
+      }
+      i+=vectorY;
+      j+=vectorX;
+      if( (i>-1) && i<5 && j>-1 && j<9 ){
+          canEliminate = true;
+      }else{
+        canEliminate = false;
+      }
+    }
+    return retour;
+  }
+
+  return (<div>
+            <h3>
+              Player 1: {nPiece[1]} <br />
+              Player 2: {nPiece[2]}
+            </h3>
+          <canvas
                 style={{
                   backgroundImage: `url(./assets/images/board.png)`,
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover',
                 }}
-                ref={canvasRef} width={1000} height={800} />;
+                ref={canvasRef} width={1000} height={800} 
+          />
+          </div>);
 }
 
 export default FanoronaBoard;
