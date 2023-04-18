@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Fanorona/static/css/main.3c5b1f41.css",
+    "main.js": "/Fanorona/static/js/main.3459762a.js",
+    "static/js/787.74b31794.chunk.js": "/Fanorona/static/js/787.74b31794.chunk.js",
+    "index.html": "/Fanorona/index.html",
+    "main.3c5b1f41.css.map": "/Fanorona/static/css/main.3c5b1f41.css.map",
+    "main.3459762a.js.map": "/Fanorona/static/js/main.3459762a.js.map",
+    "787.74b31794.chunk.js.map": "/Fanorona/static/js/787.74b31794.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3c5b1f41.css",
+    "static/js/main.3459762a.js"
+  ]
+}
