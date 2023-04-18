@@ -10,7 +10,7 @@ function FanoronaBoard() {
   const halfBlock = blockSize / 2;
   const rowCount = 5;
   const columnCount = 9;
-  const radius = blockSize / 9;
+  const radius = blockSize / 7;
   let selectedP = new Piece();
   let player = Math.ceil((Math.random()*10)%2);
   let lalanaNandeanan = [];
@@ -33,7 +33,6 @@ function FanoronaBoard() {
     // Draw tiles
     Draw();
     // ctx.drawImage(p_image,0,0,130,230,150-20,150-15,60,100);
-
     canvas.addEventListener('mousedown', rehefMouseDown);
     canvas.addEventListener('mousemove', rehefMouseMove);
     canvas.addEventListener('mouseup', rehefMouseUp);
@@ -115,11 +114,11 @@ function FanoronaBoard() {
         // ctx.fillRect(x-w, y-h, 2*w, 2*h);
         ctx.beginPath();
         if(vato === 1){
-          ctx.fillStyle = "green";
+          ctx.fillStyle = "#661111";
           ctx.arc(x, y, radius, 0, 2 * Math.PI);
           ctx.fill();
           const p_image = new Image();
-          p_image.src = "./assets/images/lot.png";
+          p_image.src = "./assets/images/vato3.png";
           p_image.onload = () => {
             ctx.drawImage(p_image,x-w/2,y-w/2,w,h);
           }
@@ -127,7 +126,7 @@ function FanoronaBoard() {
           ctx.fillStyle = "black";
           ctx.arc(x, y, radius, 0, 2 * Math.PI);
           const p_image = new Image();
-          p_image.src = "./assets/images/logo192.png";
+          p_image.src = "./assets/images/vato4.png";
           ctx.fill();
           p_image.onload = () => {
             ctx.drawImage(p_image,x-w/2,y-w/2,w,h);
@@ -411,6 +410,7 @@ function FanoronaBoard() {
               Player 1: {nPiece[1]} <br />
               Player 2: {nPiece[2]}
             </h3>
+            
           <canvas
                 style={{
                   backgroundImage: `url(./assets/images/board.png)`,
