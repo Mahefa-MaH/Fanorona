@@ -286,7 +286,7 @@ function FanoronaBoard() {
                   changePlayer = false;
                   // throw "";
                 }else{
-                  lalanaNandeanan = [];
+                  // lalanaNandeanan = [];
                   console.log("can't Eliminate");
                 }
               });
@@ -298,7 +298,7 @@ function FanoronaBoard() {
           }
 
           //Echanger le tours des players
-          if(changePlayer){player = player===2?1:2;}
+          if(changePlayer){player = player===2?1:2;lalanaNandeanan = [];}else{}
 
           activePiece = false;
           return;
