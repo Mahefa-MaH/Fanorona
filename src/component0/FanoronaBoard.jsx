@@ -80,16 +80,16 @@ function FanoronaBoard() {
 
         // Draw circle piece
         var vato = Map.map[row][col];
-        let w = 40;
-        let h = 40;
+        let w = 30;
+        let h = 30;
         if( Map.mapPObj.length === rowCount){
           if( Map.mapPObj[rowCount-1].length === columnCount){
             vato = Map.mapPObj[row][col]["p"];
             x = Map.mapPObj[row][col]["x"];
             y = Map.mapPObj[row][col]["y"];
             if(Map.mapPObj[row][col].isCaptured){
-               w = 60;
-               h = 60;
+               w = 40;
+               h = 40;
             }
           }
         }
@@ -222,7 +222,7 @@ function FanoronaBoard() {
         let r_y = ((cY -halfBlock) / blockSize) - y;
           x = x>0?x:0; x = x<9?x:8;
           y = y>0?y:0; y = y<5?y:4;
-          if(cX<=10 || cX >=1450 || cY <=10 || cY>=850 ){
+          if(cX<=10 || cX >=element.width || cY <=10 || cY>=element.height ){
             dropPiece(e,ctx);
           }
 
@@ -417,7 +417,7 @@ function FanoronaBoard() {
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover',
                 }}
-                ref={canvasRef} width={1000} height={800} 
+                ref={canvasRef}
           />
           </div>);
 }
