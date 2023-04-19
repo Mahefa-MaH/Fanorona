@@ -80,8 +80,8 @@ function FanoronaBoard() {
 
         // Draw circle piece
         var vato = Map.map[row][col];
-        let w = 30;
-        let h = 30;
+        let w = 40;
+        let h = 40;
         if( Map.mapPObj.length === rowCount){
           if( Map.mapPObj[rowCount-1].length === columnCount){
             vato = Map.mapPObj[row][col]["p"];
@@ -114,8 +114,8 @@ function FanoronaBoard() {
         // ctx.fillRect(x-w, y-h, 2*w, 2*h);
         ctx.beginPath();
         if(vato === 1){
-          ctx.fillStyle = "#661111";
-          ctx.arc(x, y, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = "#cccccc";
+          ctx.arc(x, y, radius+(w-30)/2, 0, 2 * Math.PI);
           ctx.fill();
           const p_image = new Image();
           p_image.src = "./assets/images/vato3.png";
@@ -124,7 +124,7 @@ function FanoronaBoard() {
           }
         }else if(vato === 2){
           ctx.fillStyle = "black";
-          ctx.arc(x, y, radius, 0, 2 * Math.PI);
+          ctx.arc(x, y, radius+(w-30)/2, 0, 2 * Math.PI);
           const p_image = new Image();
           p_image.src = "./assets/images/vato4.png";
           ctx.fill();
@@ -150,23 +150,32 @@ function FanoronaBoard() {
     y = y>0?y:0; y = y<5?y:4;
     if(!findEnemyPiece){
         tab_dpos = canMoveTo(x,y);
-          tab_dpos.forEach(val => {
-            // console.log(val);
-        });
 
         if(Map.mapPObj[y][x].p===player && Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && tab_dpos.length>0){
           Map.mapPObj[y][x].capture();
           selectedP = Map.mapPObj[y][x];
           DrawPiece(ctx, Map.mapPObj[y][x]["p"], x*blockSize+halfBlock, y*blockSize+halfBlock, 60, 60);
           activePiece = true;
-          // Map.mapPObj[y][x].p = 2;
-          // Map.mapPObj[y][x].x = e.clientX;
-          // Map.mapPObj[y][x].y = e.clientY;
+
+          //Draw a mark circle "canMove" position
+          tab_dpos.forEach(val => {
+            ctx.beginPath();
+            ctx.fillStyle = "#00220066";
+            ctx.arc(val[0]*blockSize+halfBlock, val[1]*blockSize+halfBlock, radius+10, 0, 2 * Math.PI);
+            ctx.fill();
+          });
+
+          //Draw a circle mark "tilePassed" position
+          lalanaNandeanan.forEach(val => {
+            ctx.beginPath();
+            ctx.fillStyle = "#22000066";
+            ctx.arc(val[0]*blockSize+halfBlock, val[1]*blockSize+halfBlock, radius+10, 0, 2 * Math.PI);
+            ctx.fill();
+          });
         }
         ctx.fillStyle = "white";
       }else{
         let changePlayer=false;
-        console.log(piece_selectable);
         for(let i=0;i<piece_selectable.length;i++){
           if(piece_selectable[i][0]===x && piece_selectable[i][1]===y ){
             console.log(x,y);
@@ -179,9 +188,11 @@ function FanoronaBoard() {
               console.log("aoriana")
             }
             if( elimin ){
-              // lalanaNandeanan.push([sp.col,sp.row]);
-              //Prevoir s'il peut eliminer encore
-              // tab_dpos = canMoveTo(x,y);
+              //Draw a mark circle "Selectable" piece
+                piece_selectable.forEach(value=>{
+                  DrawPiece(ctx, Map.mapPObj[value[1]][value[0]].p, value[0]*blockSize+80, value[1]*blockSize+80, 40, 40);
+                }
+              );
               changePlayer = true;
               tab_dpos.forEach(value=>{
                 let canEliminMoreAv = ( eliminPiece(player, ctx, value[1], value[0], value[1]-y-piece_selectable[i][3], value[0]-x-piece_selectable[i][2] , false, false)===true);
@@ -203,6 +214,8 @@ function FanoronaBoard() {
             //Echanger le tours des players
             if(changePlayer){player = player===2?1:2;lalanaNandeanan = [];}
             findEnemyPiece = false;
+
+            piece_selectable = [];
           }
         }
       }
@@ -246,7 +259,20 @@ function FanoronaBoard() {
         x = x>0?x:0; x = x<9?x:8;
         y = y>0?y:0; y = y<5?y:4;
         let dpos = false;
-        tab_dpos.forEach(value=>{if(value[0]===x&&value[1]===y){dpos = true;return;}});
+        
+        //Draw a mark circle "canMove" position
+        tab_dpos.forEach(value=>{
+                if(value[0]===x&&value[1]===y){dpos = true;}
+                DrawPiece(ctx, 0, value[0]*blockSize+80, value[1]*blockSize+80, 40, 40);
+             }
+          );
+
+        //Draw a mark circle "Passed" position
+        lalanaNandeanan.forEach(value=>{
+            DrawPiece(ctx, 0, value[0]*blockSize+80, value[1]*blockSize+80, 40, 40);
+          }
+        );
+
         lalanaNandeanan.forEach(value=>{if(value[0]===x&value[1]===y){dpos=false;return}});
         if(Math.abs(r_x) < 0.2 && Math.abs(r_y) < 0.2 && sp.isCaptured && Map.mapPObj[y][x].p === 0 && dpos){
           const a = Map.mapPObj[y][x].p;
@@ -256,6 +282,7 @@ function FanoronaBoard() {
           Map.mapPObj[y][x]["p"] = b;
           DrawPiece(ctx, b, x*blockSize+80, y*blockSize+80, 40, 40);
           DrawPiece(ctx, a, sp.x, sp.y, 40, 40);
+          
 
           //Eliminer les pieces adverses
           let vectorY = 0;
@@ -270,12 +297,21 @@ function FanoronaBoard() {
             lalanaNandeanan.push([sp.col,sp.row]);
             tab_dpos = canMoveTo(x,y);
             piece_selectable.push([x+vectorX,y+vectorY,vectorX,vectorY],[x+vectorX*-2,y+vectorY*-2,vectorX*-1,vectorY*-1]);
+            //Draw a mark circle "Find" piece
+            piece_selectable.forEach(val=>{
+              ctx.beginPath();
+              ctx.fillStyle = "#00002255";
+              ctx.arc(val[0]*blockSize+halfBlock, val[1]*blockSize+halfBlock, radius+10, 0, 2 * Math.PI);
+              ctx.fill();
+              }
+            );
           }else{
             eliminAvant = eliminPiece(player, ctx, y, x, vectorY, vectorX , false, true)===true;
             eliminArriere = eliminPiece(player, ctx, y, x, vectorY*-1, vectorX*-1, true, true)===true;
             if( eliminAvant || eliminArriere ){
               lalanaNandeanan.push([sp.col,sp.row]);
-              //Prevoir s'il peut eliminer encore
+
+              //Prevoir s'il pourra eliminer encore
               tab_dpos = canMoveTo(x,y);
               changePlayer = true;
               tab_dpos.forEach(value=>{
@@ -290,7 +326,6 @@ function FanoronaBoard() {
                   console.log("can't Eliminate");
                 }
               });
-              console.log(lalanaNandeanan,tab_dpos);
             }else{
               changePlayer = true;
               lalanaNandeanan = [];
@@ -406,11 +441,29 @@ function FanoronaBoard() {
   }
 
   return (<div>
-            <h3>
-              Player 1: {nPiece[1]} <br />
-              Player 2: {nPiece[2]}
-            </h3>
-            
+            <div style={{textAlign:`-moz-center`,}}>
+              <table style={{
+                width: `50%`,
+                textAlign: `center`,
+                color: `#fff`,
+                backgroundColor: `#000`,
+                margin: `10px`,
+                border: `5px`,
+                fontSize: `35px`,
+                borderRadius: `20px`,
+              }}>
+                <tbody>
+                <tr>
+                  <td>
+                    Player 1 : <strong>{nPiece[1]}</strong>
+                  </td>
+                  <td>
+                    Player 2 : <strong>{nPiece[2]}</strong>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           <canvas
                 style={{
                   backgroundImage: `url(./assets/images/board.png)`,

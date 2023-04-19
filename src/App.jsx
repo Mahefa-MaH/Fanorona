@@ -13,7 +13,11 @@ function App() {
               textAlign: `center`,
               paddingTop: `80px`,
             }}>
-            <button id='btn_restart'
+            <button id='btn_restart' 
+                    style={{
+                      backgroundColor: `#89fe98`,
+                      padding: `10px`,
+                    }}
             onClick={() => window.location.reload()}>
               RESTART
             </button>
