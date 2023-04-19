@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Fanorona/static/css/main.1f453595.css",
-    "main.js": "/Fanorona/static/js/main.7c55c2cc.js",
+    "main.css": "/Fanorona/static/css/main.bebd067c.css",
+    "main.js": "/Fanorona/static/js/main.865991bb.js",
     "static/js/787.74b31794.chunk.js": "/Fanorona/static/js/787.74b31794.chunk.js",
     "index.html": "/Fanorona/index.html",
-    "main.1f453595.css.map": "/Fanorona/static/css/main.1f453595.css.map",
-    "main.7c55c2cc.js.map": "/Fanorona/static/js/main.7c55c2cc.js.map",
+    "main.bebd067c.css.map": "/Fanorona/static/css/main.bebd067c.css.map",
+    "main.865991bb.js.map": "/Fanorona/static/js/main.865991bb.js.map",
     "787.74b31794.chunk.js.map": "/Fanorona/static/js/787.74b31794.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1f453595.css",
-    "static/js/main.7c55c2cc.js"
+    "static/css/main.bebd067c.css",
+    "static/js/main.865991bb.js"
   ]
 }
